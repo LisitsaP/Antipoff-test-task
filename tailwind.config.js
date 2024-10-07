@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens:{
+        'md': '850px'
+      },
       colors: {
         'violet': '#512689',
         'black': '#151317',

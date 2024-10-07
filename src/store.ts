@@ -1,5 +1,7 @@
-import { configureStore } from "@reduxjs/toolkit";
-import authSlice from "./features/authSlice";
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import authSlice from './features/authSlice';
+import likeSlice from './features/likeSlise'; 
+import usersReducer from './features/usersSlice'; 
 import {
   persistStore,
   persistReducer,
@@ -9,21 +11,28 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
-} from "redux-persist";
-import storage from "redux-persist/lib/storage"; 
+} from 'redux-persist';
+import storage from 'redux-persist/lib/storage'; 
+
 
 const persistConfig = {
-  key: "root", 
-  storage, 
+  key: 'root',
+  storage,
+  whitelist: ['auth', 'likes'], 
 };
 
 
-const persistedAuthReducer = persistReducer(persistConfig, authSlice);
+const rootReducer = combineReducers({
+  auth: authSlice,  
+  likes: likeSlice, 
+  users: usersReducer, 
+});
+
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: {
-    auth: persistedAuthReducer, 
-  },
+  reducer: persistedReducer, 
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
@@ -32,7 +41,8 @@ export const store = configureStore({
     }),
 });
 
-export const persistor = persistStore(store); 
+export const persistor = persistStore(store);
+
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
